@@ -19,10 +19,10 @@ stages:
     findbugsExcludesFile: '' #Path to findbugs exclude file
     pmdExcludes: '' # List or ANT style patterns
 
-#  integrationTests:
-#    credentials:
-#      - alias: ''
-#        credentialId: ''
+  integrationTests:
+    credentials:
+      - alias: 'MOCK_SYSTEM'
+        credentialId: 'MY-ERP'
 
 #  s4SdkQualityChecks:
 #    jacocoExcludes:
