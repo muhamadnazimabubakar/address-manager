@@ -20,19 +20,19 @@ class BusinessPartnerServlet : HttpServlet() {
     @Throws(ServletException::class, IOException::class)
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         val id: String? = request.getParameter("id")
+        if (!id.isValidId()) {
+            logger.warn("Invalid request to retrieve a business partner, id: $id.")
+            response.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "Invalid business partner ID '$id'. Business partner ID must not be empty or longer than 10 characters."
+            )
+            return
+        }
 
         val jsonResult: String = if (id == null) {
             logger.info("Retrieving all business partners")
             Gson().toJson(GetAllBusinessPartnersCommand(service).execute())
         } else {
-            if (!id.isValidId()) {
-                logger.warn("Invalid request to retrieve a business partner, id: $id.")
-                response.sendError(
-                        HttpServletResponse.SC_BAD_REQUEST,
-                        "Invalid business partner ID '$id'. Business partner ID must not be empty or longer than 10 characters."
-                )
-                return
-            }
             logger.info("Retrieving business partner with id $id")
             Gson().toJson(GetSingleBusinessPartnerByIdCommand(service, id).execute())
         }
@@ -41,10 +41,12 @@ class BusinessPartnerServlet : HttpServlet() {
         response.writer.write(jsonResult)
     }
 
-    private fun String.isValidId() = this.isNotEmpty() && this.length <= 10
+    private fun String?.isValidId() = this != null && this.isNotEmpty() && this.length <= 10
 
     companion object {
         private const val serialVersionUID = 2L
-        private val logger = CloudLoggerFactory.getLogger(BusinessPartnerServlet::class.java)
+        private val logger = getCloudLogger(BusinessPartnerServlet::class.java)
     }
 }
+
+fun getCloudLogger(cls: Class<*>) = CloudLoggerFactory.getLogger(cls)
