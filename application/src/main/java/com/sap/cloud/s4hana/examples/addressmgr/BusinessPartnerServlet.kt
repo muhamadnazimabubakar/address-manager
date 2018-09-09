@@ -21,11 +21,9 @@ class BusinessPartnerServlet : HttpServlet() {
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         val id: String? = request.getParameter("id")
 
-        val jsonResult: String
-        if (id == null) {
+        val jsonResult: String = if (id == null) {
             logger.info("Retrieving all business partners")
-            val result = GetAllBusinessPartnersCommand(service).execute()
-            jsonResult = Gson().toJson(result)
+            Gson().toJson(GetAllBusinessPartnersCommand(service).execute())
         } else {
             if (!id.isValidId()) {
                 logger.warn("Invalid request to retrieve a business partner, id: $id.")
@@ -36,8 +34,7 @@ class BusinessPartnerServlet : HttpServlet() {
                 return
             }
             logger.info("Retrieving business partner with id $id")
-            val result = GetSingleBusinessPartnerByIdCommand(service, id).execute()
-            jsonResult = Gson().toJson(result)
+            Gson().toJson(GetSingleBusinessPartnerByIdCommand(service, id).execute())
         }
 
         response.contentType = "application/json"
